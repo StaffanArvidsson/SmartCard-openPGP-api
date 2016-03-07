@@ -29,6 +29,7 @@ public class TestAPI {
 
 		byte[] message = "This should be encrypted".getBytes();
 		byte[] encryptedMessage = CryptoTools.desEncrypt(message, symmetricKey);
+		System.out.println("The encrypted message:\n" + new String(encryptedMessage, StandardCharsets.UTF_8));
 
 		OpenPgpSmartCard card = OpenPgpSmartCard.getYubiKey();
 

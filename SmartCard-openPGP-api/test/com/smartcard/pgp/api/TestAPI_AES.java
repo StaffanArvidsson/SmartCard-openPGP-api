@@ -29,6 +29,7 @@ public class TestAPI_AES {
 
 		byte[] message = "This should be encrypted".getBytes();
 		byte[] encryptedMessage = CryptoTools.aesEncrypt(message, symmetricKey);
+		System.out.println("The encrypted message:\n" + new String(encryptedMessage, StandardCharsets.UTF_8));
 
 		OpenPgpSmartCard card = OpenPgpSmartCard.getYubiKey();
 
@@ -41,9 +42,9 @@ public class TestAPI_AES {
 
 			//--------
 
-			byte[] decryptedKey = card.decipher_all_in_one_transmit(encryptedKey);
+			byte[] decryptedKey = card.decipher_original(encryptedKey);
 
-			byte[] decryptedMessage = CryptoTools.desDecrypt(encryptedMessage, CryptoTools.desKeyFromBytes(decryptedKey));
+			byte[] decryptedMessage = CryptoTools.aesDecrypt(encryptedMessage, CryptoTools.aesKeyFromBytes(decryptedKey));
 			System.out.println("The message was:\n" + new String(decryptedMessage, StandardCharsets.UTF_8));
 
 		} catch(Exception e) {

@@ -98,13 +98,13 @@ public class APDU {
 		int length = data.length;
 
 		byte lenBytes = (byte ) (length +1); // should be 0x00 padding before key, to specify RSA
-
-		byte cla;
+		byte[] header = null;
+//		byte cla;
 		if(chain) 
-			cla = 0x10; 
+			header = new byte[]{0x10, 0x2a, (byte) 0x80, (byte) 0x86, lenBytes, 0x00};
 		else 
-			cla = 0x00;
-		byte[] header = {cla, 0x2a, (byte) 0x80, (byte) 0x86, lenBytes, 0x00}; // added 0x00 in the end for RSA
+			header = new byte[]{0x00, 0x2a, (byte) 0x80, (byte) 0x86, lenBytes};
+//		byte[] header = {cla, 0x2a, (byte) 0x80, (byte) 0x86, lenBytes, 0x00}; // added 0x00 in the end for RSA
 		byte[] bytes = new byte[data.length + header.length + 1];
 
 		System.arraycopy(header, 0, bytes, 0, header.length);

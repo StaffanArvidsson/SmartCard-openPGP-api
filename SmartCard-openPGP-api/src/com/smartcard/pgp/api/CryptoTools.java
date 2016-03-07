@@ -69,8 +69,9 @@ public class CryptoTools {
 	}
 	
 	public static SecretKey aesKeyFromBytes(byte[] bytes) throws InvalidKeySpecException, NoSuchAlgorithmException{
-		SecretKeySpec keySpec = new SecretKeySpec(bytes, "AES");
-		return SecretKeyFactory.getInstance("AES").generateSecret(keySpec);
+//		SecretKeySpec keySpec = new SecretKeySpec(bytes, "AES");
+//		return SecretKeyFactory.getInstance("AES").generateSecret(keySpec);
+		return new SecretKeySpec(bytes, "AES");
 	}
 	
 	public static byte[] aesEncrypt(byte[] data, SecretKey key) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException{

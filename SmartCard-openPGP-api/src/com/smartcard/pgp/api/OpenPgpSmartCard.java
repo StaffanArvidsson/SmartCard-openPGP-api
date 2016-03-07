@@ -3,6 +3,7 @@ package com.smartcard.pgp.api;
 
 
 
+import java.io.ByteArrayOutputStream;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
@@ -42,7 +43,7 @@ public class OpenPgpSmartCard {
 		//		CardTerminal terminal = terminals.firstOrNull() ?: throw new IllegalArgumentException("Terminal not found");
 		if(terminals.isEmpty())
 			throw new IllegalArgumentException("No terminal found");
-		
+
 		CardTerminal terminal = terminals.get(0);
 
 		System.out.println("Connecting to " + terminal);  //TODO remove
@@ -50,7 +51,7 @@ public class OpenPgpSmartCard {
 
 		return new OpenPgpSmartCard(card);
 	}
-	
+
 	/**
 	 * Tries to open a connection to a YubiKey. If no YubiKey is found, a IllegalArgumentException will be thrown 
 	 * @return
@@ -69,7 +70,6 @@ public class OpenPgpSmartCard {
 		if(terminal == null)
 			throw new IllegalArgumentException("Terminal not found");
 
-		System.out.println("Connecting to " + terminal);  //TODO remove
 		Card card = terminal.connect("T=1");
 
 		return new OpenPgpSmartCard(card);
@@ -112,7 +112,7 @@ public class OpenPgpSmartCard {
 
 		return ResponseParser.parsePublicKey(response.getBytes());
 	}
-	
+
 	/**
 	 * Tries to do the decipher in one transmit (Specification says smart cards should allow 2048 bytes APDUs)
 	 * transmits of up to 2KB
@@ -126,7 +126,7 @@ public class OpenPgpSmartCard {
 
 		return response.getData();
 	}
-	
+
 	/**
 	 * Breaks up the decipher-call into two transmits, using 
 	 * @param encrypted
@@ -136,12 +136,12 @@ public class OpenPgpSmartCard {
 	public byte[] decipher_breaking_into_two(byte[] encrypted) throws CardException {
 		if(encrypted.length != 256) 
 			throw new IllegalArgumentException("Sorry, size has to be = 256");
-		
+
 		byte[] part1 = new byte[200];
 		for(int i=0; i<part1.length; i++){
 			part1[i] = encrypted[i];
 		}
-		
+
 		byte[] part2 = new byte[encrypted.length - 200];
 		for(int i=0; i<part2.length; i++){
 			part2[i] = encrypted[part1.length+i];
@@ -166,17 +166,14 @@ public class OpenPgpSmartCard {
 		if(encrypted.length != 256) 
 			throw new IllegalArgumentException("Sorry, size has to be = 256");
 
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream( );
+		outputStream.write(0);
+		outputStream.write(encrypted, 0, 201);
+		byte[] part1 = outputStream.toByteArray();
 
-		byte[] part1 = new byte[201]; 
-
-		for(int i=0;i<part1.length; i++){ // take first 0-200 spots
-			part1[i] = encrypted[i];
-		}
-
-		byte[] part2 = new byte[55];
-		for(int i=0; i<part2.length; i++){ // take 201-255
-			part2[i] = encrypted[201+i];
-		}
+		ByteArrayOutputStream outputStream2 = new ByteArrayOutputStream( );
+		outputStream2.write(encrypted, 201, encrypted.length - 201);
+		byte[] part2 = outputStream2.toByteArray();
 
 		ResponseAPDU response1 = cardChannel.transmit(APDU.decipher(part1, true));
 		interpretResponse(response1);
