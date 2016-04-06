@@ -1,6 +1,4 @@
 package com.smartcard.pgp.api;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
-
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -20,6 +18,10 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
 public class CryptoTools {
+	
+	public final static String RSA_TRANSFORMATION = "RSA/ECB/PKCS1Padding";
+	public final static String AES_TRANSFORMATION = "AES/CBC/PKCS5Padding";
+	public final static String DES_TRANSFORMATION = "DESede/CBC/PKCS5Padding";
 
 	private static final byte[] iv16 = {
 			0x01, 
@@ -40,12 +42,8 @@ public class CryptoTools {
 			(byte) 0x69
 			};
 
-	public static void enableBouncyCastle() {
-		Security.addProvider(new BouncyCastleProvider());
-	}
-
 	public static byte[] rsaEncrypt(PublicKey key, byte[] data) throws NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException {
-		Cipher rsa = Cipher.getInstance("RSA/NONE/PKCS1Padding"); // RSA/ECB/PKCS1Padding
+		Cipher rsa = Cipher.getInstance(RSA_TRANSFORMATION);
 		rsa.init(Cipher.ENCRYPT_MODE, key);
 		return rsa.doFinal(data);
 	}
@@ -75,28 +73,28 @@ public class CryptoTools {
 	}
 	
 	public static byte[] aesEncrypt(byte[] data, SecretKey key) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException{
-		Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+		Cipher cipher = Cipher.getInstance(AES_TRANSFORMATION);
 		IvParameterSpec spec = new IvParameterSpec(iv16);
 		cipher.init(Cipher.ENCRYPT_MODE, key, spec);
 		return cipher.doFinal(data);
 	}
 	
 	public static byte[] aesDecrypt(byte[] data, SecretKey key) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException {
-		Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+		Cipher cipher = Cipher.getInstance(AES_TRANSFORMATION);
 		IvParameterSpec spec = new IvParameterSpec(iv16);
 		cipher.init(Cipher.DECRYPT_MODE, key, spec);
 		return cipher.doFinal(data);
 	}
 
 	public static byte[] desEncrypt(byte[] data, SecretKey key) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException {
-		Cipher cipher = Cipher.getInstance("DESede/CBC/PKCS5Padding");
+		Cipher cipher = Cipher.getInstance(DES_TRANSFORMATION);
 		IvParameterSpec spec = new IvParameterSpec(new byte[8]);
 		cipher.init(Cipher.ENCRYPT_MODE, key, spec);
 		return cipher.doFinal(data);
 	}
 
 	public static byte[] desDecrypt(byte[] data, SecretKey key) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException {
-		Cipher cipher = Cipher.getInstance("DESede/CBC/PKCS5Padding");
+		Cipher cipher = Cipher.getInstance(DES_TRANSFORMATION);
 		IvParameterSpec spec = new IvParameterSpec(new byte[8]);
 		cipher.init(Cipher.DECRYPT_MODE, key, spec);
 		return cipher.doFinal(data);

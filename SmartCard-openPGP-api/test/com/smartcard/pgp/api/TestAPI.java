@@ -1,6 +1,7 @@
 package com.smartcard.pgp.api;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
@@ -13,6 +14,9 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import javax.smartcardio.CardException;
 
+import org.junit.Assert;
+import org.junit.Test;
+
 import com.smartcard.pgp.api.CryptoTools;
 import com.smartcard.pgp.api.OpenPgpSmartCard;
 
@@ -20,16 +24,21 @@ import com.smartcard.pgp.api.OpenPgpSmartCard;
 
 public class TestAPI {
 	
+	private static Charset charset = StandardCharsets.UTF_8;
 
-	public static void main(String[] args) throws CardException, NoSuchAlgorithmException, InvalidKeyException, NoSuchPaddingException, InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException, IOException {
+	@Test
+	public void testWithDES() throws CardException, NoSuchAlgorithmException, InvalidKeyException, NoSuchPaddingException, InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException, IOException {
 		
-		CryptoTools.enableBouncyCastle();
 
 		SecretKey symmetricKey = CryptoTools.desKeyGenerate();
+		
+		String msg1 = "This should be encrypted";
+		String msg2 = "This String is VERY secret, do not tell it to anyone!";
 
-		byte[] message = "This should be encrypted".getBytes();
-		byte[] encryptedMessage = CryptoTools.desEncrypt(message, symmetricKey);
-		System.out.println("The encrypted message:\n" + new String(encryptedMessage, StandardCharsets.UTF_8));
+		byte[] encryptedMessage = CryptoTools.desEncrypt(msg1.getBytes(charset), symmetricKey);
+		byte[] encryptedMessage2 = CryptoTools.desEncrypt(msg2.getBytes(charset), symmetricKey);
+		
+		String msg1_result=null, msg2_result=null;
 
 		OpenPgpSmartCard card = OpenPgpSmartCard.getYubiKey();
 
@@ -41,17 +50,25 @@ public class TestAPI {
 			byte[] encryptedKey = CryptoTools.rsaEncrypt(key, symmetricKey.getEncoded());
 
 			//--------
+			// YubiKey step
+			byte[] decrypted = card.decipher(encryptedKey);
 
-			byte[] decrypted = card.decipher_original(encryptedKey);
-
+			//--------
 			byte[] decryptedMessage = CryptoTools.desDecrypt(encryptedMessage, CryptoTools.desKeyFromBytes(decrypted));
-			System.out.println("The message was:\n" + new String(decryptedMessage, StandardCharsets.UTF_8));
+			byte[] decryptedMessage2 = CryptoTools.desDecrypt(encryptedMessage2, CryptoTools.desKeyFromBytes(decrypted));
+			msg1_result = new String(decryptedMessage, charset);
+			msg2_result = new String(decryptedMessage2, charset);
 
 		} catch(Exception e) {
 			e.printStackTrace();
+			Assert.fail();
 		} finally {
 			card.disconnect();
 		}
+		
+		Assert.assertEquals(msg1, msg1_result);
+		Assert.assertEquals(msg2, msg2_result);
+		
 	}
 
 	final protected static char[] hexArray = "0123456789ABCDEF".toCharArray();

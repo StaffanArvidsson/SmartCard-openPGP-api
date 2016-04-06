@@ -113,47 +113,6 @@ public class OpenPgpSmartCard {
 		return ResponseParser.parsePublicKey(response.getBytes());
 	}
 
-	/**
-	 * Tries to do the decipher in one transmit (Specification says smart cards should allow 2048 bytes APDUs)
-	 * transmits of up to 2KB
-	 * @param encrypted
-	 * @return
-	 * @throws CardException
-	 */
-	public byte[] decipher_all_in_one_transmit(byte[] encrypted) throws CardException {
-		ResponseAPDU response = cardChannel.transmit(APDU.decipher_all_in_one(encrypted));
-		interpretResponse(response);
-
-		return response.getData();
-	}
-
-	/**
-	 * Breaks up the decipher-call into two transmits, using 
-	 * @param encrypted
-	 * @return
-	 * @throws CardException
-	 */
-	public byte[] decipher_breaking_into_two(byte[] encrypted) throws CardException {
-		if(encrypted.length != 256) 
-			throw new IllegalArgumentException("Sorry, size has to be = 256");
-
-		byte[] part1 = new byte[200];
-		for(int i=0; i<part1.length; i++){
-			part1[i] = encrypted[i];
-		}
-
-		byte[] part2 = new byte[encrypted.length - 200];
-		for(int i=0; i<part2.length; i++){
-			part2[i] = encrypted[part1.length+i];
-		}
-		ResponseAPDU response1 = cardChannel.transmit(APDU.decipher_break_into_two(part1, true));
-		interpretResponse(response1);
-
-		ResponseAPDU response2 = cardChannel.transmit(APDU.decipher_break_into_two(part2, false));
-		interpretResponse(response2);
-
-		return response2.getData();
-	}
 
 	/**
 	 * The original implementation of decipher (from <a href=https://github.com/atok/smartcard-encrypt"> atok/smartcard-encrypt </a>
@@ -161,8 +120,7 @@ public class OpenPgpSmartCard {
 	 * @return
 	 * @throws CardException
 	 */
-	public byte[] decipher_original(byte[] encrypted) throws CardException {
-		//FIXME support other lengths
+	public byte[] decipher(byte[] encrypted) throws CardException {
 		if(encrypted.length != 256) 
 			throw new IllegalArgumentException("Sorry, size has to be = 256");
 

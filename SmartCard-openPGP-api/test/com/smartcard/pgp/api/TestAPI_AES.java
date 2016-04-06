@@ -2,6 +2,7 @@ package com.smartcard.pgp.api;
 
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
@@ -14,22 +15,33 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import javax.smartcardio.CardException;
 
+import org.junit.Test;
+
 import com.smartcard.pgp.api.CryptoTools;
 import com.smartcard.pgp.api.OpenPgpSmartCard;
+
+import junit.framework.Assert;
 
 
 
 public class TestAPI_AES {
 	
+	private static Charset charset = StandardCharsets.UTF_8;
 	
-	public static void main(String[] args) throws CardException, NoSuchAlgorithmException, InvalidKeyException, NoSuchPaddingException, InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException, IOException {
-		CryptoTools.enableBouncyCastle();
+	@Test
+	public void testAES_WithYubikey() throws CardException, NoSuchAlgorithmException, InvalidKeyException, NoSuchPaddingException, InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException, IOException {
 
 		SecretKey symmetricKey = CryptoTools.aesKeyGenerate();
 
-		byte[] message = "This should be encrypted".getBytes();
-		byte[] encryptedMessage = CryptoTools.aesEncrypt(message, symmetricKey);
-		System.out.println("The encrypted message:\n" + new String(encryptedMessage, StandardCharsets.UTF_8));
+		String msg1 = "This should be encrypted";
+		String msg2 = "This String is VERY secret, do not tell it to anyone!";
+		
+//		byte[] message = ;
+		byte[] encryptedMessage = CryptoTools.aesEncrypt(msg1.getBytes(charset), symmetricKey);
+		byte[] encryptedMessage2 = CryptoTools.aesEncrypt(msg2.getBytes(charset), symmetricKey);
+//		System.out.println("The encrypted message:\n" + new String(encryptedMessage, StandardCharsets.UTF_8));
+		
+		String msg1_result=null, msg2_result=null;
 
 		OpenPgpSmartCard card = OpenPgpSmartCard.getYubiKey();
 
@@ -42,16 +54,24 @@ public class TestAPI_AES {
 
 			//--------
 
-			byte[] decryptedKey = card.decipher_original(encryptedKey);
+			byte[] decryptedKey = card.decipher(encryptedKey);
 
 			byte[] decryptedMessage = CryptoTools.aesDecrypt(encryptedMessage, CryptoTools.aesKeyFromBytes(decryptedKey));
-			System.out.println("The message was:\n" + new String(decryptedMessage, StandardCharsets.UTF_8));
+			byte[] decryptedMessage2 = CryptoTools.aesDecrypt(encryptedMessage2, CryptoTools.aesKeyFromBytes(decryptedKey));
+			msg1_result = new String(decryptedMessage, charset);
+			msg2_result = new String(decryptedMessage2, charset);
+//			System.out.println("The message was:\n" + new String(decryptedMessage, StandardCharsets.UTF_8));
 
 		} catch(Exception e) {
 			e.printStackTrace();
+			Assert.fail();
 		} finally {
 			card.disconnect();
 		}
+		
+		Assert.assertEquals(msg1, msg1_result);
+		Assert.assertEquals(msg2, msg2_result);
+		
 	}
 
 	final protected static char[] hexArray = "0123456789ABCDEF".toCharArray();
