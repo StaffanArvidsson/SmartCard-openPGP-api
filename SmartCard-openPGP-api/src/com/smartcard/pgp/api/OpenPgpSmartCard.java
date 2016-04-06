@@ -57,7 +57,7 @@ public class OpenPgpSmartCard {
 	 * @return
 	 * @throws CardException
 	 */
-	public static OpenPgpSmartCard getYubiKey() throws CardException {
+	public static OpenPgpSmartCard getYubiKey() throws CardException, IllegalArgumentException {
 		TerminalFactory terminalFactory = TerminalFactory.getDefault();
 		List<CardTerminal> terminals = terminalFactory.terminals().list();
 		CardTerminal terminal =null;
