@@ -1,4 +1,4 @@
-package test;
+package com.smartcard.pgp.test;
 
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;

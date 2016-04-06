@@ -7,7 +7,7 @@
 	<property name="classes.dir" value="${build.dir}/classes" />
 	<property name="jar.dir" value="${build.dir}/jar" />
 	
-	<property name="main-class" value="test/Test" />
+	<property name="main-class" value="com.smartcard.pgp.test/Test" />
 		
 	<path id="classpath">
 			<fileset dir="${lib.dir}" includes="**/*.jar" />
@@ -70,7 +70,9 @@
 			-keepattributes *Signature*
 			-keepattributes *Annotation*
 			
-			-keep public class test.Test { *; }
+			-keep public class com.smartcard.pgp.test.Test { *; }
+			-keep public class com.smartcard.pgp.api.CryptoTools { *; }
+			-keep public class com.smartcard.pgp.api.OpenPgpSmartCard { *; }
 			
 		</proguard>
 	</target>
