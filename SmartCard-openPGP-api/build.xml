@@ -1,0 +1,82 @@
+<project name="smartcard-io" basedir="." default="dist-large">
+	
+	<property name="src.dir" value="src" />
+	<property name="test.dir" value="test" />
+	<property name="lib.dir" value="lib" />
+	<property name="build.dir" value="build" />
+	<property name="classes.dir" value="${build.dir}/classes" />
+	<property name="jar.dir" value="${build.dir}/jar" />
+	
+	<property name="main-class" value="test/Test" />
+		
+	<path id="classpath">
+			<fileset dir="${lib.dir}" includes="**/*.jar" />
+	</path>
+
+	
+	
+    <target name="clean">
+        <delete dir="build"/>
+    </target>
+
+	
+	
+    <target name="compile">
+        <mkdir dir="build/classes"/>
+    	<javac includeantruntime="false" srcdir="${src.dir}" destdir="${classes.dir}" classpathref="classpath" />
+    </target>
+
+	
+	
+    <target name="jar" depends="compile">
+    	<mkdir dir="${jar.dir}" />
+    	<jar destfile="${jar.dir}/${ant.project.name}.jar" basedir="${classes.dir}">
+            <manifest>
+                <attribute name="Main-Class" value="${main-class}"/>
+            </manifest>
+        	
+        </jar>
+    </target>
+	
+	
+	
+	<target id="dist-large" name="dist-large" depends="obfuscator">
+		<jar destfile="${build.dir}/${ant.project.name}-withdeps.jar">
+			<manifest>
+				<attribute name="Main-Class" value="${main-class}"/>
+			</manifest>
+			
+			<zipgroupfileset dir="${build.dir}/jar">
+				<include name="${ant.project.name}-ob.jar" />
+			</zipgroupfileset>
+			
+		</jar>	
+	</target>
+	
+	
+	
+	
+	<target name="obfuscator" depends="jar">
+		<taskdef resource="proguard/ant/task.properties" classpath="${lib.dir}/proguard.jar" />
+		<proguard>
+			
+			-libraryjars ${java.home}/lib/rt.jar
+			-libraryjars ${java.home}/lib/jce.jar
+			
+			-injars     ${jar.dir}/${ant.project.name}.jar
+			-outjars    ${jar.dir}/${ant.project.name}-ob.jar
+			
+			
+			-keepattributes *Signature*
+			-keepattributes *Annotation*
+			
+			-keep public class test.Test { *; }
+			
+		</proguard>
+	</target>
+	
+	
+	
+	
+	
+</project>
