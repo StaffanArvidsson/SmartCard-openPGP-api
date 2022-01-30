@@ -1,8 +1,6 @@
 package com.smartcard.pgp.api;
 
 
-
-
 import java.io.ByteArrayOutputStream;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
@@ -18,9 +16,6 @@ import javax.smartcardio.TerminalFactory;
 
 import com.smartcard.pgp.api.iso.APDU;
 import com.smartcard.pgp.api.iso.ResponseParser;
-
-//import sandbox.yubikeyAPI.iso.APDU;
-//import sandbox.yubikeyAPI.iso.ResponseParser;
 
 public class OpenPgpSmartCard {
 
@@ -94,7 +89,7 @@ public class OpenPgpSmartCard {
 		ResponseAPDU response = cardChannel.transmit(APDU.verify(pinValue));
 		try{
 			interpretResponse(response);
-		} catch(RuntimeException ex){
+		} catch (RuntimeException ex){
 			throw new IllegalArgumentException("Password verification failed");
 		}
 	}
