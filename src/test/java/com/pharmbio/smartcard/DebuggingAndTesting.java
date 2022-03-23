@@ -6,8 +6,6 @@ import java.security.PublicKey;
 
 import javax.crypto.SecretKey;
 
-import com.pharmbio.smartcard.utils.CryptoTools;
-
 public class DebuggingAndTesting {
 	
 	private static Charset charset = StandardCharsets.UTF_8;

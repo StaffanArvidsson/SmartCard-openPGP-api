@@ -15,8 +15,6 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import javax.smartcardio.CardException;
 
-import com.pharmbio.smartcard.utils.CryptoTools;
-
 import org.junit.Assert;
 import org.junit.Test;
 
