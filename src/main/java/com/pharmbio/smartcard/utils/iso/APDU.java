@@ -14,9 +14,9 @@ public class APDU {
 	}
 
 	public static CommandAPDU verify(String pin, int p2) {
-		if(p2 != 0x82 && p2 != 0x81 && p2 != 0x83)
+		if (p2 != 0x82 && p2 != 0x81 && p2 != 0x83)
 			throw new IllegalArgumentException("only 0x81, 0x82 o 0x83 allowed for PIN verification");
-		if((p2 == 0x81 || p2 == 0x82) && (pin.length()< 4 || pin.length() > 8))
+		if ((p2 == 0x81 || p2 == 0x82) && (pin.length()< 4 || pin.length() > 8))
 			throw new IllegalArgumentException("PIN must be 4 to 8 chars long (ASCII format)");
 		byte[] header = {0x00, 0x20, 0x00, (byte) p2, (byte) pin.length()};
 		byte[] body = pin.getBytes(StandardCharsets.UTF_8);
