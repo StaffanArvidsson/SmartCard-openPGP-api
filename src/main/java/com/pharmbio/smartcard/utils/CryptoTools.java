@@ -1,9 +1,9 @@
-package com.smartcard.pgp.api;
+package com.pharmbio.smartcard.utils;
+
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
-import java.security.Security;
 import java.security.spec.InvalidKeySpecException;
 
 import javax.crypto.BadPaddingException;
@@ -42,7 +42,10 @@ public class CryptoTools {
 			(byte) 0x69
 			};
 
-	public static byte[] rsaEncrypt(PublicKey key, byte[] data) throws NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException {
+	public static byte[] rsaEncrypt(PublicKey key, byte[] data) 
+		throws NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, 
+			BadPaddingException, InvalidKeyException {
+				
 		Cipher rsa = Cipher.getInstance(RSA_TRANSFORMATION);
 		rsa.init(Cipher.ENCRYPT_MODE, key);
 		return rsa.doFinal(data);
@@ -56,44 +59,55 @@ public class CryptoTools {
 	}
 	
 	public static SecretKey aesKeyGenerate() throws NoSuchAlgorithmException{
+
 		KeyGenerator gen = KeyGenerator.getInstance("AES");
 		gen.init(128);
 		return gen.generateKey();
 	}
 
-	public static SecretKey desKeyFromBytes(byte[] bytes) throws InvalidKeyException, InvalidKeySpecException, NoSuchAlgorithmException {
+	public static SecretKey desKeyFromBytes(byte[] bytes) 
+		throws InvalidKeyException, InvalidKeySpecException, NoSuchAlgorithmException {
+
 		DESedeKeySpec spec = new DESedeKeySpec(bytes);
 		return SecretKeyFactory.getInstance("DESede").generateSecret(spec);
 	}
 	
-	public static SecretKey aesKeyFromBytes(byte[] bytes) throws InvalidKeySpecException, NoSuchAlgorithmException{
-//		SecretKeySpec keySpec = new SecretKeySpec(bytes, "AES");
-//		return SecretKeyFactory.getInstance("AES").generateSecret(keySpec);
+	public static SecretKey aesKeyFromBytes(byte[] bytes) 
+		throws InvalidKeySpecException, NoSuchAlgorithmException{
 		return new SecretKeySpec(bytes, "AES");
 	}
 	
-	public static byte[] aesEncrypt(byte[] data, SecretKey key) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException{
+	public static byte[] aesEncrypt(byte[] data, SecretKey key) 
+		throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, 
+			InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException {
+
 		Cipher cipher = Cipher.getInstance(AES_TRANSFORMATION);
 		IvParameterSpec spec = new IvParameterSpec(iv16);
 		cipher.init(Cipher.ENCRYPT_MODE, key, spec);
 		return cipher.doFinal(data);
 	}
 	
-	public static byte[] aesDecrypt(byte[] data, SecretKey key) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException {
+	public static byte[] aesDecrypt(byte[] data, SecretKey key) 
+		throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, 
+			InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException {
 		Cipher cipher = Cipher.getInstance(AES_TRANSFORMATION);
 		IvParameterSpec spec = new IvParameterSpec(iv16);
 		cipher.init(Cipher.DECRYPT_MODE, key, spec);
 		return cipher.doFinal(data);
 	}
 
-	public static byte[] desEncrypt(byte[] data, SecretKey key) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException {
+	public static byte[] desEncrypt(byte[] data, SecretKey key) 
+		throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, 
+			InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException {
 		Cipher cipher = Cipher.getInstance(DES_TRANSFORMATION);
 		IvParameterSpec spec = new IvParameterSpec(new byte[8]);
 		cipher.init(Cipher.ENCRYPT_MODE, key, spec);
 		return cipher.doFinal(data);
 	}
 
-	public static byte[] desDecrypt(byte[] data, SecretKey key) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException {
+	public static byte[] desDecrypt(byte[] data, SecretKey key) 
+		throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, 
+			InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException {
 		Cipher cipher = Cipher.getInstance(DES_TRANSFORMATION);
 		IvParameterSpec spec = new IvParameterSpec(new byte[8]);
 		cipher.init(Cipher.DECRYPT_MODE, key, spec);

@@ -1,0 +1,8 @@
+# Compiled output
+target/
+
+# IDE settings
+.vscode/
+
+# Mac specific files
+.DS_Store

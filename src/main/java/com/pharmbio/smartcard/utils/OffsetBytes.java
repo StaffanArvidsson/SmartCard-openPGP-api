@@ -1,6 +1,4 @@
-package com.smartcard.pgp.api;
-
-import java.util.ArrayList;
+package com.pharmbio.smartcard.utils;
 
 public class OffsetBytes {
 	
@@ -17,7 +15,6 @@ public class OffsetBytes {
     }
 
     public byte[] next(int cnt) {
-//        val ret = bytes.sliceArray((offset..offset+cnt-1))
     	byte[] ret = new byte[cnt];
     	for(int i=0; i<cnt; i++){
     		ret[i] = bytes[offset + i];
@@ -33,7 +30,6 @@ public class OffsetBytes {
 
     public boolean check(byte[] checked) {
         byte[] has = next(checked.length);
-//        for(i in 0..checked.size-1) {
         for(int i=0; i<checked.length; i++){
             if(checked[i] != has[i]) 
             	return false;
@@ -58,21 +54,14 @@ public class OffsetBytes {
     }
 
     public String toString() {
-//    	String[] bytesAsHex = new String[bytes.length];
     	StringBuilder output = new StringBuilder();
     	for(int i=0;i<offset; i++){
-    		output.append(Integer.toHexString(bytes[i] & 0xff) + " ");
-//    		bytesAsHex[i] = Integer.toHexString(bytes[i]);	
+    		output.append(Integer.toHexString(bytes[i] & 0xff)).append(' ');
     	}
-//        val printed = bytes.map {
-//            val v = it.toInt() and 0xff
-//            Integer.toHexString(v)
-//        }
     	output.append("||");
     	for(int i=offset; i<bytes.length;i++){
     		output.append(" " + Integer.toHexString(bytes[i]));
     	}
     	return output.toString();
-//        return printed.take(offset).joinToString(" ") + " || " + printed.takeLast(printed.size - offset).joinToString(" ");
     }
 }

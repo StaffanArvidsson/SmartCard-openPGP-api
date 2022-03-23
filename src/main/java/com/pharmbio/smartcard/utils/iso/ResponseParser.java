@@ -1,4 +1,4 @@
-package com.smartcard.pgp.api.iso;
+package com.pharmbio.smartcard.utils.iso;
 
 
 import java.math.BigInteger;
@@ -8,7 +8,7 @@ import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.RSAPublicKeySpec;
 
-import com.smartcard.pgp.api.OffsetBytes;
+import com.pharmbio.smartcard.utils.OffsetBytes;
 
 
 public class ResponseParser {
@@ -98,6 +98,7 @@ public class ResponseParser {
 				output += ", Secure messaging not supported";
 			break;
 		case 0x69: output = "Command not allowed, ";
+		
 		switch(sw2) {
 		case 0x00: break;
 		case 0x81: output += "Command incompatible with file structure"; break;

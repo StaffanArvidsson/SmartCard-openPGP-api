@@ -1,4 +1,4 @@
-package com.smartcard.pgp.test;
+package com.pharmbio.smartcard;
 
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -6,10 +6,9 @@ import java.security.PublicKey;
 
 import javax.crypto.SecretKey;
 
-import com.smartcard.pgp.api.CryptoTools;
-import com.smartcard.pgp.api.OpenPgpSmartCard;
+import com.pharmbio.smartcard.utils.CryptoTools;
 
-public class Test {
+public class DebuggingAndTesting {
 	
 	private static Charset charset = StandardCharsets.UTF_8;
 	

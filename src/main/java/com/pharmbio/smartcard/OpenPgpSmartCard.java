@@ -1,5 +1,4 @@
-package com.smartcard.pgp.api;
-
+package com.pharmbio.smartcard;
 
 import java.io.ByteArrayOutputStream;
 import java.security.NoSuchAlgorithmException;
@@ -14,8 +13,8 @@ import javax.smartcardio.CardTerminal;
 import javax.smartcardio.ResponseAPDU;
 import javax.smartcardio.TerminalFactory;
 
-import com.smartcard.pgp.api.iso.APDU;
-import com.smartcard.pgp.api.iso.ResponseParser;
+import com.pharmbio.smartcard.utils.iso.APDU;
+import com.pharmbio.smartcard.utils.iso.ResponseParser;
 
 public class OpenPgpSmartCard {
 
@@ -24,24 +23,24 @@ public class OpenPgpSmartCard {
 
 	public OpenPgpSmartCard(Card card){
 		this.card = card;
-		cardChannel = card.getBasicChannel();
+		this.cardChannel = card.getBasicChannel();
 	}
 
 	/**
 	 * Tries to open the first terminal, if that fails, a IllegalArgumentException will be thrown 
-	 * @return
+	 * @return a {@code OpenPgpSmartCard} instance 
 	 * @throws CardException
 	 */
 	public static OpenPgpSmartCard getDefault() throws CardException {
 		TerminalFactory terminalFactory = TerminalFactory.getDefault();
 		List<CardTerminal> terminals = terminalFactory.terminals().list();
 		//		CardTerminal terminal = terminals.firstOrNull() ?: throw new IllegalArgumentException("Terminal not found");
-		if(terminals.isEmpty())
+		if (terminals.isEmpty())
 			throw new IllegalArgumentException("No terminal found");
 
 		CardTerminal terminal = terminals.get(0);
 
-		System.out.println("Connecting to " + terminal);  //TODO remove
+		// System.out.println("Connecting to " + terminal);  //TODO remove
 		Card card = terminal.connect("T=1");
 
 		return new OpenPgpSmartCard(card);
@@ -49,7 +48,7 @@ public class OpenPgpSmartCard {
 
 	/**
 	 * Tries to open a connection to a YubiKey. If no YubiKey is found, a IllegalArgumentException will be thrown 
-	 * @return
+	 * @return a {@code OpenPgpSmartCard} instance for a YubiKey
 	 * @throws CardException
 	 */
 	public static OpenPgpSmartCard getYubiKey() throws CardException, IllegalArgumentException {
@@ -62,7 +61,7 @@ public class OpenPgpSmartCard {
 				break;
 			}
 		}
-		if(terminal == null)
+		if (terminal == null)
 			throw new IllegalArgumentException("Terminal not found");
 
 		Card card = terminal.connect("T=1");
@@ -140,7 +139,7 @@ public class OpenPgpSmartCard {
 	public void sign(byte[] bytes) throws CardException {
 		ResponseAPDU signAnswer = cardChannel.transmit(APDU.sign(bytes));
 		interpretResponse(signAnswer);
-		System.out.println("Sign data $signAnswer");
+		// System.out.println("Sign data $signAnswer");
 	}
 
 	public void disconnect() throws CardException {
@@ -151,14 +150,14 @@ public class OpenPgpSmartCard {
 		int sw1 = response.getSW1();
 		int sw2 = response.getSW2();
 
-		if(sw1 == 0x61){
-			System.out.println("There is still " + sw2 + " bytes left to get");
-		}
-		if(sw1 == 0x90 || sw1 == 0x61) //0x90 =OK, 0x61 = more info
+		// if (sw1 == 0x61){
+		// 	System.out.println("There is still " + sw2 + " bytes left to get");
+		// }
+		if (sw1 == 0x90 || sw1 == 0x61) //0x90 =OK, 0x61 = more info
 			return; //OK
 		String msg = ResponseParser.message(sw1, sw2);
 
-		throw new RuntimeException(response + "\n" + msg);
+		throw new RuntimeException(response + System.lineSeparator() + msg);
 	}
 
 	public byte[] getData(int tag1, int tag2) throws CardException{

@@ -1,4 +1,4 @@
-package com.smartcard.pgp.api.iso;
+package com.pharmbio.smartcard.utils.iso;
 
 import java.nio.charset.StandardCharsets;
 
@@ -8,7 +8,7 @@ public class APDU {
 	// CLA INS PI P2 LC CDATA
 	private static final byte[] OPEN_PGP_AID = {(byte)0xD2, 0x76, 0x00, 0x01, 0x24, 0x01};
 
-	public enum Pin { Pin1, Pin2 };
+	public enum Pin { Pin1, Pin2 }; // TODO - remove?
 
 	//TODO 0x81
 	public static CommandAPDU verify(String pin){
@@ -17,7 +17,7 @@ public class APDU {
 
 	public static CommandAPDU verify(String pin, int p2) {
 		if(p2 != 0x82 && p2 != 0x81 && p2 != 0x83)
-			throw new IllegalArgumentException("only 0x81 and 0x82 allowed for PIN verification");
+			throw new IllegalArgumentException("only 0x81, 0x82 o 0x83 allowed for PIN verification");
 		if((p2 == 0x81 || p2 == 0x82) && (pin.length()< 4 || pin.length() > 8))
 			throw new IllegalArgumentException("PIN must be 4 to 8 chars long (ASCII format)");
 		byte[] header = {0x00, 0x20, 0x00, (byte) p2, (byte) pin.length()};
@@ -46,16 +46,13 @@ public class APDU {
 	}
 
 	public static CommandAPDU decipher(byte [] data, boolean chain) {
-		int length = data.length;
-
-		byte lenBytes = (byte ) length; 
 
 		byte cla;
-		if(chain) 
+		if (chain) 
 			cla = 0x10; 
 		else 
 			cla = 0x00;
-		byte[] header = {cla, 0x2a, (byte) 0x80, (byte) 0x86, lenBytes};
+		byte[] header = {cla, 0x2a, (byte) 0x80, (byte) 0x86, (byte) data.length};
 		byte[] bytes = new byte[data.length + 6];
 
 		System.arraycopy(header, 0, bytes, 0, header.length);
@@ -145,6 +142,7 @@ public class APDU {
 	}
 
 	final private static char[] hexArray = "0123456789ABCDEF".toCharArray();
+	
 	private static String bytesToHex(byte[] bytes) {
 		char[] hexChars = new char[bytes.length * 2];
 		for ( int j = 0; j < bytes.length; j++ ) {
