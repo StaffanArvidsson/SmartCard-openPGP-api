@@ -1,4 +1,4 @@
-package com.pharmbio.smartcard.utils;
+package com.pharmbio.smartcard;
 
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;

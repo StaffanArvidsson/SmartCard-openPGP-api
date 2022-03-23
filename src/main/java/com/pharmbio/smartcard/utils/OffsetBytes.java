@@ -25,7 +25,7 @@ public class OffsetBytes {
     }
 
     public int nextAsInt() {
-        return (int) bytes[offset++]; //.toInt() and 0xff
+        return (int) bytes[offset++];
     }
 
     public boolean check(byte[] checked) {
@@ -38,7 +38,7 @@ public class OffsetBytes {
     }
 
     public boolean check(int checked) {
-        return check(new byte[]{(byte) checked});// byteArrayOf(checked.toByte()));
+        return check(new byte[]{(byte) checked});
     }
 
     public boolean check(int... checked) {
@@ -60,7 +60,7 @@ public class OffsetBytes {
     	}
     	output.append("||");
     	for(int i=offset; i<bytes.length;i++){
-    		output.append(" " + Integer.toHexString(bytes[i]));
+    		output.append(' ').append(Integer.toHexString(bytes[i]));
     	}
     	return output.toString();
     }

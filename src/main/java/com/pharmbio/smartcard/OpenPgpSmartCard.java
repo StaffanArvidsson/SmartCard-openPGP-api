@@ -34,13 +34,11 @@ public class OpenPgpSmartCard {
 	public static OpenPgpSmartCard getDefault() throws CardException {
 		TerminalFactory terminalFactory = TerminalFactory.getDefault();
 		List<CardTerminal> terminals = terminalFactory.terminals().list();
-		//		CardTerminal terminal = terminals.firstOrNull() ?: throw new IllegalArgumentException("Terminal not found");
 		if (terminals.isEmpty())
 			throw new IllegalArgumentException("No terminal found");
 
 		CardTerminal terminal = terminals.get(0);
 
-		// System.out.println("Connecting to " + terminal);  //TODO remove
 		Card card = terminal.connect("T=1");
 
 		return new OpenPgpSmartCard(card);
@@ -80,8 +78,8 @@ public class OpenPgpSmartCard {
 	}
 
 	/**
-	 * Verifies the pin-code on the Smart Card
-	 * @param pinValue
+	 * Verifies the pin code on the Smart Card
+	 * @param pinValue pin code to verify
 	 * @throws CardException
 	 */
 	public void verify(String pinValue) throws CardException {
@@ -115,7 +113,7 @@ public class OpenPgpSmartCard {
 	 * @throws CardException
 	 */
 	public byte[] decipher(byte[] encrypted) throws CardException {
-		if(encrypted.length != 256) 
+		if (encrypted.length != 256) 
 			throw new IllegalArgumentException("Sorry, size has to be = 256");
 
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream( );
@@ -139,7 +137,6 @@ public class OpenPgpSmartCard {
 	public void sign(byte[] bytes) throws CardException {
 		ResponseAPDU signAnswer = cardChannel.transmit(APDU.sign(bytes));
 		interpretResponse(signAnswer);
-		// System.out.println("Sign data $signAnswer");
 	}
 
 	public void disconnect() throws CardException {
@@ -150,9 +147,6 @@ public class OpenPgpSmartCard {
 		int sw1 = response.getSW1();
 		int sw2 = response.getSW2();
 
-		// if (sw1 == 0x61){
-		// 	System.out.println("There is still " + sw2 + " bytes left to get");
-		// }
 		if (sw1 == 0x90 || sw1 == 0x61) //0x90 =OK, 0x61 = more info
 			return; //OK
 		String msg = ResponseParser.message(sw1, sw2);

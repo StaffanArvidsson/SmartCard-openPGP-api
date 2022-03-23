@@ -8,8 +8,6 @@ public class APDU {
 	// CLA INS PI P2 LC CDATA
 	private static final byte[] OPEN_PGP_AID = {(byte)0xD2, 0x76, 0x00, 0x01, 0x24, 0x01};
 
-	public enum Pin { Pin1, Pin2 }; // TODO - remove?
-
 	//TODO 0x81
 	public static CommandAPDU verify(String pin){
 		return verify(pin, 0x82);
@@ -36,7 +34,6 @@ public class APDU {
 		System.arraycopy(header, 0, data, 0, header.length);
 		System.arraycopy(body, 0, data, header.length, body.length);
 		data[data.length] = 0x00;
-		//      return CommandAPDU(bytes(0x00, 0x2a, 0x9e, 0x9a, data.size) + data + bytes(0x00))
 		return new CommandAPDU(data);
 	}
 
@@ -63,53 +60,6 @@ public class APDU {
 		return new CommandAPDU(bytes);
 	}
 
-
-
-//	public static CommandAPDU decipher_all_in_one(byte [] data) {
-//		int length = data.length +1 +1; // +1 for the 0x00 indicating RSA, +1 for Le
-//		byte[] header = null;
-//
-//		if(length >= 256){
-//			// Lc is here 0x00 and b1 + b2
-//			byte b1 = (byte) ((length >> 8) & 0xFF);
-//			byte b2 = (byte) (length & 0xFF);
-//			header = new byte[]{0x00, 0x2a, (byte) 0x80, (byte) 0x86, 0x00, b1, b2, 0x00}; //last 0x00 is for indicating RSA
-//
-//		} else {
-//			// Lc is only the first byte now!
-//			byte lenBytes = (byte ) length; 
-//			header = new byte[]{0x00, 0x2a, (byte) 0x80, (byte) 0x86, lenBytes, 0x00}; //last 0x00 is for indicating RSA
-//		}
-//
-//		byte[] bytes = new byte[header.length + data.length + 1]; // +1 for Le= 0x00
-//
-//		System.arraycopy(header, 0, bytes, 0, header.length);
-//		System.arraycopy(data, 0, bytes, header.length, data.length);
-//
-//		bytes[bytes.length-1] = 0x00; //Le (get all)
-//
-//		return new CommandAPDU(bytes);
-//	}
-//
-//	public static CommandAPDU decipher_break_into_two(byte[] data, boolean chain){
-//		int length = data.length;
-//
-//		byte lenBytes = (byte ) (length +1); // should be 0x00 padding before key, to specify RSA
-//		byte[] header = null;
-////		byte cla;
-//		if(chain) 
-//			header = new byte[]{0x10, 0x2a, (byte) 0x80, (byte) 0x86, lenBytes, 0x00};
-//		else 
-//			header = new byte[]{0x00, 0x2a, (byte) 0x80, (byte) 0x86, lenBytes};
-////		byte[] header = {cla, 0x2a, (byte) 0x80, (byte) 0x86, lenBytes, 0x00}; // added 0x00 in the end for RSA
-//		byte[] bytes = new byte[data.length + header.length + 1];
-//
-//		System.arraycopy(header, 0, bytes, 0, header.length);
-//		System.arraycopy(data, 0, bytes, header.length, data.length);
-//		bytes[bytes.length-1] = 0x00;
-//		return new CommandAPDU(bytes);
-//	}
-
 	public static CommandAPDU selectApplet(){
 		return selectApplet(OPEN_PGP_AID);
 	}
@@ -123,33 +73,9 @@ public class APDU {
 		return new CommandAPDU(new byte[]{0x00, 0x47, (byte) 0x81, 0x00, 0x02, (byte) 0xB8, 0x00});
 	}
 
-	// TODO: use this instead of the System.arraycopy?
-	private static byte[] getByteArr(int... byteArray) {
-		byte[] bytes = new byte[byteArray.length];
-		for(int i=0; i< byteArray.length; i++){
-			if(byteArray[i] >255){
-				throw new IllegalArgumentException("Value to big: "+ byteArray[i]);
-			}
-			bytes[i] = (byte) byteArray[i];
-		}
-
-		return bytes;
-	}
-
 	public static CommandAPDU getData(int tag1, int tag2) {
 		byte[] bytes = {0x00, (byte) 0xca,(byte)tag1, (byte)tag2, 0x00};
 		return new CommandAPDU(bytes);
 	}
 
-	final private static char[] hexArray = "0123456789ABCDEF".toCharArray();
-	
-	private static String bytesToHex(byte[] bytes) {
-		char[] hexChars = new char[bytes.length * 2];
-		for ( int j = 0; j < bytes.length; j++ ) {
-			int v = bytes[j] & 0xFF;
-			hexChars[j * 2] = hexArray[v >>> 4];
-			hexChars[j * 2 + 1] = hexArray[v & 0x0F];
-		}
-		return new String(hexChars);
-	}
 }
